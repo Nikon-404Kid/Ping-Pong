@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { text-align: center; background: #222; color: white; font-family: sans-serif; }
+        canvas { background: #000; display: block; margin: 20px auto; border: 2px solid #fff; }
+    </style>
+</head>
+<body>
+    <h2>Пинг-Понг</h2>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <p>Управление: Двигай мышку вверх-вниз</p>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let ball = { x: 400, y: 200, dx: 4, dy: 4, radius: 10 };
+        let paddle = { x: 10, y: 150, width: 10, height: 80 };
+
+        canvas.addEventListener("mousemove", (e) => {
+            let rect = canvas.getBoundingClientRect();
+            paddle.y = e.clientY - rect.top - paddle.height / 2;
+        });
+
+        function update() {
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Отскок от стен
+            if (ball.y < 0 || ball.y > canvas.height) ball.dy *= -1;
+            if (ball.x > canvas.width) ball.dx *= -1;
+
+            // Отскок от ракетки
+            if (ball.x < paddle.x + paddle.width && 
+                ball.y > paddle.y && ball.y < paddle.y + paddle.height) {
+                ball.dx *= -1;
+            }
+
+            // Проигрыш
+            if (ball.x < 0) {
+                alert("Игра окончена!");
+                ball.x = 400; ball.y = 200;
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+        loop();
+    </script>
+</body>
+</html>
